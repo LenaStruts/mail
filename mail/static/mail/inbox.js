@@ -67,6 +67,41 @@ function load_mailbox(mailbox) {
 
     // Show the mailbox name
     document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+    // fetch the api
+    fetch(`/emails/${mailbox}`)
+        .then(response => response.json())
+        .then(emails => {
+            emails.forEach(email => {
+                let recipientsOrSender;
+                if (mailbox === 'sent') {
+                    recipientsOrSender = email.recipients;
+                } else {
+                    recipientsOrSender = email.sender;
+                }
+                const element = document.createElement('div');
+                element.className = "card mb-3";
+                if (mailbox === 'inbox') {
+                    if (email.read === true) {
+                        element.style.background = "#d3d3d3";
+                    } else {
+                        element.style.background = "#f7f7f7";
+                    }
+                } else {
+                    element.style.background = "#f7f7f7";
+                }
+
+                element.innerHTML = `
+                        <div class="card-body">
+                            <h5 class="card-title">Subject: ${email.subject}</h5>
+                            <p class="card-text">${recipientsOrSender}</p>
+                            <p class="card-text"><small class="text-muted">time: ${email.timestamp}</p>
+                            <button class="btn btn-primary" id="view-${email.id}">View email</button>
+                        </div>`;
+                document.querySelector('#emails-view').append(element);
+                document.querySelector(`#view-${email.id}`).onclick = () => view_email(email.id);
+            })
+        });
 }
 
 function view_email(id) {
