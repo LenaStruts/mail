@@ -66,3 +66,23 @@ function load_mailbox(mailbox) {
     // Show the mailbox name
     document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 }
+
+// Turn emails into read
+function read(id) {
+    fetch(`/emails/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            read: true
+        })
+    })
+}
+
+// Switch emails from unarchived to archived and reverse
+function archived(id, archived = true) {
+    return fetch(`/emails/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            archived
+        })
+    });
+}
