@@ -141,12 +141,33 @@ function view_email(id) {
                 });
             button.innerHTML = !email.archived ? "Archive" : "Unarchive";
 
+            document.querySelector(`#reply-${email.id}`).onclick = () => reply(email.sender, email.subject, email.body, email.timestamp);
+            header = document.querySelector('h2').innerHTML
+
+            if (header != email.sender) {
+                button.style.visibility = 'visible';
+                document.querySelector(`#reply-${email.id}`).style.visibility = 'visible';
+            } else {
+                button.style.visibility = 'hidden';
+                document.querySelector(`#reply-${email.id}`).style.visibility = 'hidden';
+            }
 
             // Make email read
             read(id);
         });
 }
 
+// Reply the emails
+function reply(sender, subject, body, timestamp) {
+    compose_email();
+    document.querySelector("#compose-recipients").value = sender;
+    if (subject.startsWith("Re: ")) {
+        document.querySelector("#compose-subject").value = subject;
+    } else {
+        document.querySelector("#compose-subject").value = `Re: ${subject}`;
+    }
+    document.querySelector("#compose-body").value = `---\nOn ${timestamp} ${sender} wrote:\n${body}\n---\n`;
+}
 
 // Turn emails into read
 function read(id) {
