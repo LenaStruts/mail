@@ -15,6 +15,7 @@ function compose_email() {
     // Show compose view and hide other views
     document.querySelector('#emails-view').style.display = 'none';
     document.querySelector('#compose-view').style.display = 'block';
+    document.querySelector('#email').style.display = 'none';
 
     // Clear out composition fields
     document.querySelector('#compose-recipients').value = '';
@@ -62,10 +63,55 @@ function load_mailbox(mailbox) {
     // Show the mailbox and hide other views
     document.querySelector('#emails-view').style.display = 'block';
     document.querySelector('#compose-view').style.display = 'none';
+    document.querySelector('#email').style.display = 'none';
 
     // Show the mailbox name
     document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 }
+
+function view_email(id) {
+    // Show the mailbox and hide other views
+    document.querySelector('#email').innerHTML = '';
+    document.querySelector('#email').style.display = 'block';
+    document.querySelector('#emails-view').style.display = 'none';
+    document.querySelector('#compose-view').style.display = 'none';
+
+    // Fetch the api
+    fetch(`/emails/${id}`)
+        .then(response => response.json())
+        .then(email => {
+            const element = document.createElement('div');
+            element.className = "card bg-light mb-3";
+            element.innerHTML = `
+            <div class="card-body">
+                <h5 class="card-title">Subject: ${email.subject}</h5>
+                <p class="card-text">from: ${email.sender}</p>
+                <p class="card-text">to: ${email.recipients}</p>
+                <p class="card-text">${email.body}</p>
+                <p class="card-text"><small class="text-muted">time: ${email.timestamp}</p>
+                <button class="btn btn-primary" id="id-${email.id}">Archive</button>
+                <button class="btn btn-primary" id="reply-${email.id}">Reply</button>
+            </div>`;
+            document.querySelector('#email').append(element);
+            // Archive/unarchive emails
+            const button = document.querySelector(`#id-${email.id}`);
+            button.onclick = () =>
+                archived(id, !email.archived)
+                .then(function() {
+                    if (!email.archived) {
+                        load_mailbox("archive");
+                    } else {
+                        load_mailbox("inbox");
+                    }
+                });
+            button.innerHTML = !email.archived ? "Archive" : "Unarchive";
+
+
+            // Make email read
+            read(id);
+        });
+}
+
 
 // Turn emails into read
 function read(id) {
