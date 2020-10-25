@@ -75,7 +75,7 @@ function load_mailbox(mailbox) {
             emails.forEach(email => {
                 let recipientsOrSender;
                 if (mailbox === 'sent') {
-                    recipientsOrSender = email.recipients.join(', ');
+                    recipientsOrSender = email.recipients;
                 } else {
                     recipientsOrSender = email.sender;
                 }
@@ -83,23 +83,24 @@ function load_mailbox(mailbox) {
                 element.className = "container emails";
                 if (mailbox === 'inbox') {
                     if (email.read === true) {
-                        element.style.background = "#dfdede";
+                        element.style.background = "#d3d3d3";
                     } else {
                         element.style.background = "#f7f7f7";
                     }
                 } else {
                     element.style.background = "#f7f7f7";
                 }
+                console.log(recipientsOrSender);
                 element.innerHTML = `
                     <div class="row" id="view-${email.id}">
                         <div class="col-4">
-                            <p class="emails--recipients">${recipientsOrSender}</p>
+                            <p><strong>${recipientsOrSender}</strong></p>
                         </div>
                         <div class="col-4">
                             <p>${email.subject}</p>
                         </div>
                         <div class="col-4">
-                            <p class="emails--timestamp">${email.timestamp}</p>
+                            <p>${email.timestamp}</p>
                         </div>
                     </div>
                         `;
@@ -125,13 +126,12 @@ function view_email(id) {
             element.innerHTML = `
             <div class="card-body">
                 <h5 class="card-title">Subject: ${email.subject}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">from: ${email.sender}</h6>
-                <h6 class="card-subtitle mb-2 text-muted">to: ${email.recipients}</h6>
-                <p class="card-text body">${email.body}</p>
+                <p class="card-text">from: ${email.sender}</p>
+                <p class="card-text">to: ${email.recipients}</p>
+                <p class="card-text">${email.body}</p>
                 <p class="card-text"><small class="text-muted">time: ${email.timestamp}</p>
-                <button class="btn btn-outline-primary" id="reply-${email.id}"><i class="fas fa-reply"></i> Reply</button>
-                <button class="btn btn-outline-primary" id="id-${email.id}">Archive</button>
-                
+                <button class="btn btn-primary" id="id-${email.id}">Archive</button>
+                <button class="btn btn-primary" id="reply-${email.id}">Reply</button>
             </div>`;
             document.querySelector('#email').append(element);
             // Archive/unarchive emails
