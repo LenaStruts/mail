@@ -14,8 +14,8 @@
 The purpose of this project is to implement a single-page-app email client using JavaScript, HTML, and CSS.
 
 ## Screenshots
-![Screenshot1](https://user-images.githubusercontent.com/61382735/97169023-a7e9ae00-1789-11eb-8c13-bb47564d22fa.png)
-![Screenshot2](https://user-images.githubusercontent.com/61382735/97169072-bc2dab00-1789-11eb-921c-75bd469c30ee.png)
+![Screenshot1](https://user-images.githubusercontent.com/61382735/97169600-994fc680-178a-11eb-9626-d8bcf687b232.png)
+![Screenshot2](https://user-images.githubusercontent.com/61382735/97169394-4aa22c80-178a-11eb-9b8d-3a78874b7865.png)
 
 ## Technologies
 * Python - version 3.6
