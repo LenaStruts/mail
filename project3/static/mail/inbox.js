@@ -4,13 +4,13 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
     document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
     document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
-    document.querySelector('#compose').addEventListener('click', compose_email);
+    document.querySelector('#compose').addEventListener('click', () => compose_email());
 
     // By default, load the inbox
     load_mailbox('inbox');
 });
 
-function compose_email() {
+function compose_email(recipients = '', subject = '', body = '') {
 
     // Show compose view and hide other views
     document.querySelector('#emails-view').style.display = 'none';
@@ -18,40 +18,40 @@ function compose_email() {
     document.querySelector('#email').style.display = 'none';
 
     // Clear out composition fields
-    document.querySelector('#compose-recipients').value = '';
-    document.querySelector('#compose-subject').value = '';
-    document.querySelector('#compose-body').value = '';
+    document.querySelector('#compose-recipients').value = recipients;
+    document.querySelector('#compose-subject').value = subject;
+    document.querySelector('#compose-body').value = body;
 
     // Adding event listener to the form
     let form = document.querySelector("#compose-form");
     form.addEventListener("submit", (event) => {
         event.preventDefault();
-        let recipients = document.querySelector("#compose-recipients");
-        let subject = document.querySelector("#compose-subject");
-        let body = document.querySelector("#compose-body");
+        let recipientsElement = document.querySelector("#compose-recipients");
+        let subjectElement = document.querySelector("#compose-subject");
+        let bodyElement = document.querySelector("#compose-body");
 
         // Checking with the user if he/she wants to send an email without subject/body
         if (
-            (subject.value || confirm("Do you want to send an email without subject?")) &&
-            (body.value || confirm("Do you want to send an email without body?"))
+            (subjectElement.value || confirm("Do you want to send an email without subject?")) &&
+            (bodyElement.value || confirm("Do you want to send an email without body?"))
         ) {
 
             // Fetching the api
             fetch('/emails', {
                     method: 'POST',
                     body: JSON.stringify({
-                        recipients: recipients.value,
-                        subject: subject.value,
-                        body: body.value
+                        recipients: recipientsElement.value,
+                        subject: subjectElement.value,
+                        body: bodyElement.value
                     })
                 })
                 .then((response) => response.json())
                 .then(result => {
-                    console.log(result);
                     if (result.message) {
                         load_mailbox("sent");
                     } else {
                         alert(result.error);
+                        compose_email(recipients, subjectElement.value, bodyElement.value);
                     }
                 });
         }
@@ -90,6 +90,14 @@ function load_mailbox(mailbox) {
                 } else {
                     element.style.background = "#f7f7f7";
                 }
+                const date = new Date(Date.parse(email.timestamp));
+                const datestr = date.toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                });
                 element.innerHTML = `
                     <div class="row" id="view-${email.id}">
                         <div class="col-4">
@@ -99,7 +107,7 @@ function load_mailbox(mailbox) {
                             <p>${email.subject}</p>
                         </div>
                         <div class="col-4">
-                            <p class="emails--timestamp">${email.timestamp}</p>
+                            <p class="emails--timestamp">${datestr}</p>
                         </div>
                     </div>
                         `;
