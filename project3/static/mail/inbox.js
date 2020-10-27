@@ -58,6 +58,18 @@ function compose_email(recipients = '', subject = '', body = '') {
     }, { once: true });
 }
 
+function time(timestamp) {
+    const date = new Date(Date.parse(timestamp));
+    const datestr = date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+    });
+    return datestr;
+}
+
 function load_mailbox(mailbox) {
 
     // Show the mailbox and hide other views
@@ -90,14 +102,6 @@ function load_mailbox(mailbox) {
                 } else {
                     element.style.background = "#f7f7f7";
                 }
-                const date = new Date(Date.parse(email.timestamp));
-                const datestr = date.toLocaleDateString(undefined, {
-                    year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                });
                 element.innerHTML = `
                     <div class="row" id="view-${email.id}">
                         <div class="col-4">
@@ -107,7 +111,7 @@ function load_mailbox(mailbox) {
                             <p>${email.subject}</p>
                         </div>
                         <div class="col-4">
-                            <p class="emails--timestamp">${datestr}</p>
+                            <p class="emails--timestamp">${time(email.timestamp)}</p>
                         </div>
                     </div>
                         `;
@@ -136,7 +140,7 @@ function view_email(id) {
                 <h6 class="card-subtitle mb-2 text-muted">from: ${email.sender}</h6>
                 <h6 class="card-subtitle mb-2 text-muted">to: ${email.recipients}</h6>
                 <p class="card-text body">${email.body}</p>
-                <p class="card-text"><small class="text-muted">time: ${email.timestamp}</p>
+                <p class="card-text"><small class="text-muted">time: ${time(email.timestamp)}</p>
                 <button class="btn btn-outline-primary" id="reply-${email.id}"><i class="fas fa-reply"></i> Reply</button>
                 <button class="btn btn-outline-primary" id="id-${email.id}">Archive</button>
                 
@@ -180,7 +184,7 @@ function reply(sender, subject, body, timestamp) {
     } else {
         document.querySelector("#compose-subject").value = `Re: ${subject}`;
     }
-    document.querySelector("#compose-body").value = `---\nOn ${timestamp} ${sender} wrote:\n${body}\n---\n`;
+    document.querySelector("#compose-body").value = `---\nOn ${time(timestamp)} ${sender} wrote:\n${body}\n---\n`;
 }
 
 // Turn emails into read
