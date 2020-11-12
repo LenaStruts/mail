@@ -10,53 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     load_mailbox('inbox');
 });
 
-function compose_email(recipients = '', subject = '', body = '') {
-
-    // Show compose view and hide other views
-    document.querySelector('#emails-view').style.display = 'none';
-    document.querySelector('#compose-view').style.display = 'block';
-    document.querySelector('#email').style.display = 'none';
-
-    // Clear out composition fields
-    document.querySelector('#compose-recipients').value = recipients;
-    document.querySelector('#compose-subject').value = subject;
-    document.querySelector('#compose-body').value = body;
-
-    // Adding event listener to the form
-    let form = document.querySelector("#compose-form");
-    form.addEventListener("submit", (event) => {
-        event.preventDefault();
-        let recipientsElement = document.querySelector("#compose-recipients");
-        let subjectElement = document.querySelector("#compose-subject");
-        let bodyElement = document.querySelector("#compose-body");
-
-        // Checking with the user if he/she wants to send an email without subject/body
-        if (
-            (subjectElement.value || confirm("Do you want to send an email without subject?")) &&
-            (bodyElement.value || confirm("Do you want to send an email without body?"))
-        ) {
-
-            // Fetching the api
-            fetch('/emails', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        recipients: recipientsElement.value,
-                        subject: subjectElement.value,
-                        body: bodyElement.value
-                    })
-                })
-                .then((response) => response.json())
-                .then(result => {
-                    if (result.message) {
-                        load_mailbox("sent");
-                    } else {
-                        alert(result.error);
-                        compose_email(recipients, subjectElement.value, bodyElement.value);
-                    }
-                });
-        }
-    }, { once: true });
-}
+// Transforming time using locale conventions
 
 function time(timestamp) {
     const date = new Date(Date.parse(timestamp));
@@ -70,7 +24,59 @@ function time(timestamp) {
     return datestr;
 }
 
+// The EventListener function of the event handler to add/remove from the event target.
+
+function sendEmail(event) {
+    event.preventDefault();
+    let recipientsElement = document.querySelector("#compose-recipients");
+    let subjectElement = document.querySelector("#compose-subject");
+    let bodyElement = document.querySelector("#compose-body");
+
+    // Checking with the user if he/she wants to send an email without subject/body
+    if (
+        (subjectElement.value || confirm("Do you want to send an email without subject?")) &&
+        (bodyElement.value || confirm("Do you want to send an email without body?"))
+    ) {
+
+        // Fetching the api
+        fetch('/emails', {
+                method: 'POST',
+                body: JSON.stringify({
+                    recipients: recipientsElement.value,
+                    subject: subjectElement.value,
+                    body: bodyElement.value
+                })
+            })
+            .then((response) => response.json())
+            .then(result => {
+                if (result.message) {
+                    load_mailbox("sent");
+                } else {
+                    alert(result.error);
+                    compose_email(recipients, subjectElement.value, bodyElement.value);
+                }
+            });
+    }
+}
+
+function compose_email(recipients = '', subject = '', body = '') {
+
+    // Show compose view and hide other views
+    document.querySelector('#emails-view').style.display = 'none';
+    document.querySelector('#compose-view').style.display = 'block';
+    document.querySelector('#email').style.display = 'none';
+
+    // Clear out composition fields
+    document.querySelector('#compose-recipients').value = recipients;
+    document.querySelector('#compose-subject').value = subject;
+    document.querySelector('#compose-body').value = body;
+
+    // Adding event listener to the form
+    document.querySelector("#compose-form").addEventListener("submit", sendEmail, { once: true });
+}
+
 function load_mailbox(mailbox) {
+    document.querySelector("#compose-form").removeEventListener("submit", sendEmail);
 
     // Show the mailbox and hide other views
     document.querySelector('#emails-view').style.display = 'block';
